@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import java.util.Date;
@@ -16,6 +18,7 @@ import java.util.Date;
 public class JwtUtil {
     final static String base64EncodedSecretKey = "base64EncodedSecretKey";//私钥
     final static long TOKEN_EXP = 1000 * 60;//过期时间,测试使用60秒
+    final static Logger LOGGER = LoggerFactory.getLogger(JwtUtil.class);
 
     public static String getToken(String userName) {
         return Jwts.builder()
@@ -32,13 +35,13 @@ public class JwtUtil {
      * @Author:root
      * @Desc:检查token,只要不正确就会抛出异常
      **/
-    public static void checkToken(String token) throws ServletException {
+    public static boolean checkToken(String token) {
         try {
-            final Claims claims = Jwts.parser().setSigningKey(base64EncodedSecretKey).parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e1) {
-            throw new ServletException("token expired");
+            Claims claims = Jwts.parser().setSigningKey(base64EncodedSecretKey).parseClaimsJws(token).getBody();
+            return true;
         } catch (Exception e) {
-            throw new ServletException("other token exception");
+            LOGGER.error("token check error:", e);
+            return false;
         }
     }
 }
