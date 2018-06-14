@@ -38,6 +38,7 @@ public class JwtUtil {
     public static boolean checkToken(String token) {
         try {
             Claims claims = Jwts.parser().setSigningKey(base64EncodedSecretKey).parseClaimsJws(token).getBody();
+            LOGGER.info("请求成功，token有效");
             return true;
         } catch (Exception e) {
             LOGGER.error("token check error:", e);

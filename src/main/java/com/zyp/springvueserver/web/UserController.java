@@ -38,10 +38,11 @@ public class UserController {
 
     @PostMapping("/check")
     public boolean check(HttpServletRequest request) {
+        System.out.println("****************");
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("uid".equals(cookie.getName())) {
+                if ("test_vue".equals(cookie.getName())) {
                     return JwtUtil.checkToken(cookie.getValue());
                 }
             }
