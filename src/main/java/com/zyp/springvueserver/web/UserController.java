@@ -1,7 +1,9 @@
 package com.zyp.springvueserver.web;
 
+import com.zyp.springvueserver.config.WeixinConfig;
 import com.zyp.springvueserver.model.User;
 import com.zyp.springvueserver.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zhuyunpeng on 2018/06/01
@@ -19,6 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+    @Autowired
+    WeixinConfig weixinConfig;
 
     @PostMapping("/login")
     public boolean login(User user, HttpServletResponse response) throws ServletException {
@@ -65,5 +72,32 @@ public class UserController {
     @GetMapping("/getEmail")
     public String getEmail() {
         return "xxxx@qq.com";
+    }
+
+    @GetMapping("/getLoginUrl")
+    public Map<String, String> getLoginUrl() {
+        Map<String, String> result = new HashMap<>();
+        result.put("weixinUrl", weixinConfig.getPcRequestUrl());
+        result.put("gitlabUrl", "http://gitlab.com");
+        return result;
+    }
+
+    @PostMapping("/logout")
+    public boolean logout(HttpServletRequest request, HttpServletResponse response) {
+        //退出系统，清空cookie信息，并跳转至登录页面
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if ("test_vue".equals(c.getName())) {
+                    c.setPath("/");
+                    c.setMaxAge(0);
+                    c.setValue(null);
+                    response.addCookie(c);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
